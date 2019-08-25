@@ -39,7 +39,7 @@ exports.getReferrals = (req, res, next) => {
       .exec()
       .then(referrals => {
         referrals = [...referrals];
-        
+        console.log(referrals);
         res.status(200).json(referrals);
         // res.render('referrals/referrals', { title: title, referrals: referrals, path: path});
       })
@@ -48,10 +48,10 @@ exports.getReferrals = (req, res, next) => {
   } else if (req.user.roles.coach && req.user.roles.active) {
 
     Referral.find({
-        coach: {
-          _id: req.user._id
-        }
-      })
+      coach: {
+        _id: req.user._id
+      }
+    })
       .populate('referralBy', 'name last_name')
       .populate('manager', 'email name last_name')
       .populate('updatedBy', 'name last_name')
@@ -63,14 +63,14 @@ exports.getReferrals = (req, res, next) => {
         // res.render('referrals/referrals', { title: title, referrals: referrals, path: path});
       })
       .catch(err => {
-        return res.status(500).json({msg: 'server error'})
+        return res.status(500).json({ msg: 'server error' })
       });
 
   } else if (req.user.roles.active) {
 
     Referral.find({
-        userId: req.user._id
-      })
+      userId: req.user._id
+    })
       .populate('referralBy', 'name last_name')
       .populate('manager', 'email name last_name')
       .populate('updatedBy', 'name last_name')
@@ -99,7 +99,7 @@ exports.getReferral = (req, res, next) => {
     .populate('userId', 'name last_name email')
     .exec()
     .then(referral => {
-    
+
       return res.status(200).json(referral);
       // res.render('referrals/referral-detail', { referral: referral, title: title, path: path});
     }).catch(err => console.log(err));
@@ -126,8 +126,8 @@ exports.getAddReferral = (req, res, next) => {
 exports.editReferral = (req, res, next) => {
   const id = req.params.id;
   Referral.findOne({
-      _id: id
-    })
+    _id: id
+  })
     .then(referral => {
       return res.json(referral);
 
@@ -167,8 +167,8 @@ exports.updateReferral = (req, res, next) => {
 
 
   Referral.findOneAndUpdate({
-      _id: id
-    }, {
+    _id: id
+  }, {
       name: name,
       last_name: last_name,
       address: address,
@@ -201,7 +201,7 @@ exports.updateReferral = (req, res, next) => {
       referee = `${referral.referralBy.name} ${referral.referralBy.last_name}`;
 
       res.json(referral);
-     
+
       if (status.toLowerCase() === 'closed' && !email_sent) {
         name = name.toUpperCase();
         due_date = moment(due_date).format("L");
@@ -219,7 +219,7 @@ exports.updateReferral = (req, res, next) => {
         let cc = [referral.coach.email, req.user.email];
         let rep = referral.referralBy.name.toUpperCase();
 
-        if(referral.manager._id === referral.userId) {
+        if (referral.manager._id === referral.userId) {
           cc = [referral.coach.email];
         }
 
@@ -284,25 +284,25 @@ exports.updateReferral = (req, res, next) => {
         }, (err, info) => {
           if (!err) {
             Referral.findOneAndUpdate({
-                _id: id
-              }, {
+              _id: id
+            }, {
                 email_sent: true
               }, {
                 new: true
               })
               .then(ref => {
-              console.log(ref);
-              if (sendEmailToReferee) {
-                let n = Math.floor(Math.random() * Math.floor(Quotes.length));
-                let author = Quotes[n].author;
-                let quote = Quotes[n].quote;
-    
-                return transporter.sendMail({
-                  to: [referral.referralBy.email, referral.manager.email],
-                  from: from,
-                  cc: cc,
-                  subject: `Congratulations ${rep}!`,
-                  html: `
+                console.log(ref);
+                if (sendEmailToReferee) {
+                  let n = Math.floor(Math.random() * Math.floor(Quotes.length));
+                  let author = Quotes[n].author;
+                  let quote = Quotes[n].quote;
+
+                  return transporter.sendMail({
+                    to: [referral.referralBy.email, referral.manager.email],
+                    from: from,
+                    cc: cc,
+                    subject: `Congratulations ${rep}!`,
+                    html: `
                   <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -421,13 +421,13 @@ ul li span {
 </html>
                   `
 
-                })
+                  })
 
-              }
+                }
               })
           }
         })
-    
+
       }
     })
     .catch(err => console.log(err));
@@ -439,9 +439,9 @@ ul li span {
 exports.deleteReferral = (req, res, next) => {
   const id = req.params.id;
   Referral.findOneAndRemove({
-      _id: id,
-      userId: req.user._id
-    })
+    _id: id,
+    userId: req.user._id
+  })
     .populate('referralBy', 'name last_name')
     .then((ref) => {
       if (!ref) return res.status(401).json({
@@ -478,35 +478,35 @@ exports.addReferral = async (req, res, next) => {
   try {
 
     const user = await User.findById(userId);
-    if (!user) return res.status(422).json({msg: 'No user found'});
+    if (!user) return res.status(422).json({ msg: 'No user found' });
 
 
     const referral = new Referral({
-              name: name,
-              last_name: last_name,
-              address: address,
-              apt: apt,
-              city: city,
-              zipcode: parseInt(zipcode),
-              email: email,
-              phone: phone,
-              comment: comment,
-              referralBy: referralBy,
-              status: status,
-              moveIn: moment(moveIn).format(),
-              userId: userId,
-              coach: user.coach,
-              manager: manager
-    
-            });
-       const ref = await referral.save();
-       return res.json(ref);
-       
+      name: name,
+      last_name: last_name,
+      address: address,
+      apt: apt,
+      city: city,
+      zipcode: parseInt(zipcode),
+      email: email,
+      phone: phone,
+      comment: comment,
+      referralBy: referralBy,
+      status: status,
+      moveIn: moment(moveIn).format(),
+      userId: userId,
+      coach: user.coach,
+      manager: manager
 
-    
+    });
+    const ref = await referral.save();
+    return res.json(ref);
+
+
+
   } catch (error) {
     console.log(error);
-     res.status(500).json({msg: 'server error'});
+    res.status(500).json({ msg: 'server error' });
   }
 
   // if (referralBy === 'me') {
@@ -526,10 +526,10 @@ exports.addReferral = async (req, res, next) => {
   //     })
   //     .then(u => {
   //       //if no user found.
-      
+
   //       if (!u) return res.status(404).json({msg: 'no user found'});
-       
-        
+
+
   //       if (u.title === 'coach') {
   //         coach = req.body.userId;
   //         userId = u._id;
@@ -537,7 +537,7 @@ exports.addReferral = async (req, res, next) => {
   //         coach = u.coach._id;
   //         userId = req.body.userId;
   //       }
-       
+
   //       const manager = req.body.manager || "";
 
   //       const referral = new Referral({
@@ -573,7 +573,7 @@ exports.addReferral = async (req, res, next) => {
   //     .catch(error => next(error));
 
 
-  };
+};
 
 
 
@@ -581,8 +581,8 @@ exports.getAllReferralsById = (req, res) => {
   const id = req.params.id;
 
   Referral.find({
-      referralBy: id
-    })
+    referralBy: id
+  })
     .populate('referralBy', 'name last_name')
     .sort('moveIn')
     .exec()
@@ -611,8 +611,8 @@ exports.getReferralsStatus = (req, res) => {
   const path = 'my referrals';
   if (statusRequested !== 'all') {
     Referral.find({
-        status: statusRequested
-      })
+      status: statusRequested
+    })
       .sort('-moveIn')
       .exec()
       .then(referrals => {
@@ -646,22 +646,22 @@ exports.getReferraslByDate = (req, res, next) => {
   const today = new Date().toLocaleDateString();
   const startDay = req.body.start;
   const endDay = req.body.end;
- 
+
   let start = moment(startDay).startOf('day');
   // end today
 
   let end = moment(endDay).endOf('day');
-  
+
 
   Referral.find({
-          order_date: {
-              $gte: start,
-              $lt: end
-          },
-         userId: req.user._id
-      })
-      .then(referrals => {
-          res.json(referrals);
-      })
-      .catch(err => next(err));
+    order_date: {
+      $gte: start,
+      $lt: end
+    },
+    userId: req.user._id
+  })
+    .then(referrals => {
+      res.json(referrals);
+    })
+    .catch(err => next(err));
 }
