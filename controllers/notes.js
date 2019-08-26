@@ -3,19 +3,17 @@ const moment = require('moment');
 moment().format();
 
 
-exports.addNote = (req, res, next) => {
+exports.addNote = (req, res) => {
     const note = req.body.note;
-    const created = req.body.created
 
-    if (note.length === 0) {
+    if (note.length < 3) {
         return res.status(400).json({ msg: 'a note is required' })
     }
 
     const newNote = new Note({
         note: note,
-        author: req.user._id,
-        created: created
-    })
+        author: req.user._id
+    });
 
     newNote.save()
         .then(note => {
