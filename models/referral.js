@@ -32,7 +32,7 @@ const referralSchema = new Schema({
         type: String,
         lowercase: true
     },
-    moveIn: String,
+    moveIn: Date,
     due_date: Date,
     order_date: Date,
     package: String,

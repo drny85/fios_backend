@@ -493,7 +493,7 @@ exports.addReferral = async (req, res, next) => {
       comment: comment,
       referralBy: referralBy,
       status: status,
-      moveIn: moment(moveIn).format(),
+      moveIn: new Date(moveIn),
       userId: userId,
       coach: user.coach,
       manager: manager
