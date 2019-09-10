@@ -30,6 +30,7 @@ const transporter = nodemailer.createTransport(transport({
 
 exports.getReferrals = (req, res, next) => {
   if (req.user.roles.isAdmin && req.user.roles.active) {
+    console.log(req.user);
 
     Referral.find()
       .populate('referralBy', 'name last_name')
@@ -436,25 +437,24 @@ ul li span {
 
 
 //delete referral
-exports.deleteReferral = (req, res, next) => {
-  const id = req.params.id;
-  Referral.findOneAndRemove({
-    _id: id,
-    userId: req.user._id
-  })
-    .populate('referralBy', 'name last_name')
-    .then((ref) => {
-      if (!ref) return res.status(401).json({
-        message: 'Can not delete this referral'
-      });
+exports.deleteReferral = async (req, res) => {
 
+  try {
+    const id = req.params.id;
+    const check = await Referral.findById(id);
+    if (!check) return res.status(400).json({ msg: 'no referral found' })
 
-      res.json({
-        message: 'Referral Deleted!'
-      });
-    })
-    .catch(err => console.log(err));
+    const referral = await Referral.findOneAndDelete({
+      _id: id,
+      userId: req.user._id
+    }).populate('referralBy', 'name last_name');
+    if (referral) return res.status(200).json({ msg: 'referral deleted' });
+  } catch (error) {
+    return res.status(400).json({ msg: 'error deleting referral' });
+  }
+
 }
+
 
 //adding the referral handler page
 exports.addReferral = async (req, res, next) => {
