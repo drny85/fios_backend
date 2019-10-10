@@ -4,6 +4,7 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const express = require('express');
 const path = require('path');
+const morgan = require('morgan');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const flash = require('connect-flash');
@@ -14,6 +15,7 @@ const db_pws = process.env.MY_MONGO_PASSWORD;
 const MONGO_URL = `mongodb+srv://melendez:${db_pws}@cluster0-m0t4i.mongodb.net/fios`;
 //main app
 const app = express();
+app.use(morgan('tiny'))
 app.use(cors());
 
 app.use(helmet());

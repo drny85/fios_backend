@@ -14,6 +14,7 @@ const _ = require('lodash');
 
 
 exports.getManagers = (req, res, next) => {
+
     if (req.user.roles.isAdmin || req.user.roles.coach) {
         Manager.find()
             .then(managers => {
@@ -22,18 +23,18 @@ exports.getManagers = (req, res, next) => {
                 );
 
             })
-            .catch(err => console.log(err));
+            .catch(err => res.status(400).json({ msg: "bad request" }));
     } else if (req.user.roles.active && !req.user.roles.isAdmin) {
         Manager.find({
-                userId: req.user._id
-            })
+            userId: req.user._id
+        })
             .then(managers => {
                 res.json(
                     managers
                 );
 
             })
-            .catch(err => console.log(err));
+            .catch(err => res.status(400).json({ msg: "bad request" }));
     }
 }
 
@@ -52,10 +53,10 @@ exports.postManager = (req, res, next) => {
 
 
     Manager.findOne({
-            name: name,
-            last_name: last_name,
-            userId: userId
-        })
+        name: name,
+        last_name: last_name,
+        userId: userId
+    })
         .then(result => {
             if (result) {
 
@@ -86,8 +87,8 @@ exports.getOneManager = (req, res, next) => {
 
     const id = req.params.id;
     Manager.findOne({
-            _id: id
-        })
+        _id: id
+    })
         .then(manager => {
 
             res.json(
@@ -101,19 +102,32 @@ exports.getOneManager = (req, res, next) => {
 
 //post update referre page
 
-exports.postUpdateManager = (req, res) => {
+exports.postUpdateManager = async (req, res) => {
     const id = req.params.id;
-    // const title = "Update Referee";
-    // const path = 'update referee';
-    const body = _.pick(req.body, ['name', 'last_name', 'email', 'phone']);
 
-    Manager.findByIdAndUpdate(id, body, {
-            new: true
-        })
-        .then(manager => {
-            res.json(manager);
-        })
-        .catch(err => console.log(err.message));
+    try {
+        const { name, last_name, email, phone } = req.body;
+        console.log("REV:", req.body);
+        let manager = await Manager.findOneAndUpdate({ _id: id }, req.body, { new: true });
+        console.log("NEW", manager);
+        return res.json(manager)
+
+    } catch (error) {
+        return res.status(500).json({ msg: "bad request" });
+    }
+    // // const title = "Update Referee";
+    // // const path = 'update referee';
+    // console.log("Manager received", req.body);
+    // const body = _.pick(req.body, ['name', 'last_name', 'email', 'phone']);
+
+    // Manager.findByIdAndUpdate(id, body, {
+    //     new: true
+    // })
+    //     .then(manager => {
+    //         console.log("Manager Updated", manager)
+    //         res.json(manager);
+    //     })
+    //     .catch(err => console.log(err.message));
 
 
 }
@@ -121,8 +135,8 @@ exports.postUpdateManager = (req, res) => {
 exports.deleteManager = (req, res, next) => {
     const id = req.params.id;
     Manager.findOneAndDelete({
-            _id: id
-        })
+        _id: id
+    })
         .then(r => {
             res.json(r);
         })
