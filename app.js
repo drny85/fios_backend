@@ -71,7 +71,10 @@ app.use(flyerRoutes);
 mongoose
   .connect(MONGO_URL, {
     useNewUrlParser: true,
-    useCreateIndex: true
+    useCreateIndex: true,
+    useFindAndModify: true,
+
+
   })
   .then(result => {
     let PORT = process.env.PORT || 3000;

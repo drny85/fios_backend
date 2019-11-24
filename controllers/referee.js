@@ -39,8 +39,8 @@ exports.getReferees = (req, res, next) => {
   } else {
 
     Referee.find({
-        userId: req.user._id
-      })
+      userId: req.user._id
+    })
       .then(referees => {
         res.json(referees);
 
@@ -63,9 +63,9 @@ exports.postReferee = (req, res, next) => {
 
 
   Referee.findOne({
-      name: name,
-      last_name: last_name
-    })
+    name: name,
+    last_name: last_name
+  })
     .then(referee => {
       if (referee) {
 
@@ -97,8 +97,8 @@ exports.getOneReferee = (req, res, next) => {
 
   const id = req.params.id;
   Referee.findOne({
-      _id: id
-    })
+    _id: id
+  })
     .then(referee => {
 
       res.json(
@@ -117,8 +117,8 @@ exports.getEditReferee = (req, res, next) => {
   const path = 'edit referee';
   const id = req.params.id;
   Referee.findOne({
-      _id: id
-    })
+    _id: id
+  })
     .then(referee => {
       res.render('referee/edit', {
         referee: referee,
@@ -138,8 +138,8 @@ exports.postUpdateReferee = (req, res) => {
   const body = _.pick(req.body, ['name', 'last_name', 'email', 'phone']);
 
   Referee.findByIdAndUpdate(id, body, {
-      new: true
-    })
+    new: true
+  })
     .then(referee => {
       res.json(referee);
     })

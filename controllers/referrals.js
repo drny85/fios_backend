@@ -53,13 +53,14 @@ exports.getReferrals = (req, res, next) => {
         _id: req.user._id
       }
     })
-      .populate('referralBy', 'name last_name')
-      .populate('manager', 'email name last_name')
-      .populate('updatedBy', 'name last_name')
+      .populate('referralBy')
+      .populate('manager')
+      .populate('updatedBy')
       .sort('moveIn')
       .exec()
       .then(referrals => {
         referrals = [...referrals];
+
         res.status(200).json(referrals);
         // res.render('referrals/referrals', { title: title, referrals: referrals, path: path});
       })
@@ -72,9 +73,9 @@ exports.getReferrals = (req, res, next) => {
     Referral.find({
       userId: req.user._id
     })
-      .populate('referralBy', 'name last_name')
-      .populate('manager', 'email name last_name')
-      .populate('updatedBy', 'name last_name')
+      .populate('referralBy')
+      .populate('manager')
+      .populate('updatedBy')
       .populate('coach', 'name last_name email')
       .sort('moveIn')
       .exec()
@@ -170,29 +171,29 @@ exports.updateReferral = (req, res, next) => {
   Referral.findOneAndUpdate({
     _id: id
   }, {
-      name: name,
-      last_name: last_name,
-      address: address,
-      apt: apt,
-      city: city,
-      zipcode: zipcode,
-      email: email,
-      phone: phone,
-      comment: comment,
-      referralBy: referralBy,
-      status: status,
-      due_date: due_date,
-      order_date: order_date,
-      package: package,
-      mon: mon,
-      moveIn: moveIn,
-      manager: manager,
-      coach: coach,
-      updated: updated,
-      updatedBy: req.user._id
-    }, {
-      new: true
-    })
+    name: name,
+    last_name: last_name,
+    address: address,
+    apt: apt,
+    city: city,
+    zipcode: zipcode,
+    email: email,
+    phone: phone,
+    comment: comment,
+    referralBy: referralBy,
+    status: status,
+    due_date: due_date,
+    order_date: order_date,
+    package: package,
+    mon: mon,
+    moveIn: moveIn,
+    manager: manager,
+    coach: coach,
+    updated: updated,
+    updatedBy: req.user._id
+  }, {
+    new: true
+  })
     .populate('referralBy', 'name last_name email')
     .populate('manager', 'email name last_name')
     .populate('updatedBy', 'name last_name')
@@ -287,10 +288,10 @@ exports.updateReferral = (req, res, next) => {
             Referral.findOneAndUpdate({
               _id: id
             }, {
-                email_sent: true
-              }, {
-                new: true
-              })
+              email_sent: true
+            }, {
+              new: true
+            })
               .then(ref => {
                 console.log(ref);
                 if (sendEmailToReferee) {
