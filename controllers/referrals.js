@@ -75,13 +75,14 @@ exports.getReferrals = (req, res, next) => {
     })
       .populate('referralBy')
       .populate('manager')
-      .populate('updatedBy')
+      .populate('updatedBy', '-password')
       .populate('coach', 'name last_name email')
       .sort('moveIn')
       .exec()
       .then(referrals => {
 
         referrals = [...referrals];
+
         res.status(200).json(referrals);
         // res.render('referrals/referrals', { title: title, referrals: referrals, path: path});
       })
@@ -91,21 +92,25 @@ exports.getReferrals = (req, res, next) => {
 
 };
 
-exports.getReferral = (req, res, next) => {
+exports.getReferral = async (req, res, next) => {
   const id = req.params.id;
-  Referral.findById(id)
-    .populate('referralBy', 'name last_name _id')
-    .populate('manager', 'email name last_name')
-    .populate('updatedBy', 'name last_name')
-    .populate('coach', 'name last_name email')
-    .populate('userId', 'name last_name email')
-    .exec()
-    .then(referral => {
+  connsole.log(id);
+  try {
 
-      return res.status(200).json(referral);
-      // res.render('referrals/referral-detail', { referral: referral, title: title, path: path});
-    }).catch(err => console.log(err));
-};
+    const referral = await Referral.findOne({ _id: id, userId: req.user._id })
+      .populate('referralBy', 'name last_name _id')
+      .populate('manager', 'email name last_name')
+      .populate('updatedBy', 'name last_name')
+      .populate('coach', 'name last_name email')
+      .populate('userId', 'name last_name email')
+      .exec();
+
+    return res.status(200).json(referral);
+  } catch (e) {
+    return res.status(400).json({ msg: 'no referral found' });
+  }
+
+}
 
 //add a referral page
 exports.getAddReferral = (req, res, next) => {
@@ -648,10 +653,14 @@ exports.getReferraslByDate = (req, res, next) => {
   const startDay = req.body.start;
   const endDay = req.body.end;
 
+
   let start = moment(startDay).startOf('day');
   // end today
 
+
+
   let end = moment(endDay).endOf('day');
+
 
 
   Referral.find({
@@ -662,7 +671,31 @@ exports.getReferraslByDate = (req, res, next) => {
     userId: req.user._id
   })
     .then(referrals => {
+
       res.json(referrals);
     })
     .catch(err => next(err));
+}
+
+exports.getTodaySales = async (req, res) => {
+  let today = moment();
+  let start = moment(today).startOf('day');
+  let end = moment(today).endOf('day');
+  console.log(start, end, today);
+
+  try {
+    const referrals = await Referral.find({
+      userId: req.user._id,
+      order_date: {
+        $gte: start
+
+      },
+
+    });
+    console.log(referrals);
+
+    return res.status(200).json(referrals);
+  } catch (error) {
+    return res.status(400).json({ msg: "no referrals found" });
+  }
 }

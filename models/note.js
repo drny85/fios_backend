@@ -11,10 +11,7 @@ const noteSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    created: {
-        type: Date,
-        default: Date.now
-    }
+    created: Date
 })
 
 module.exports = mongoose.model('Note', noteSchema);

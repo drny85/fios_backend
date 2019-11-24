@@ -1,6 +1,6 @@
 const Note = require('../models/note');
-const moment = require('moment');
-moment().format();
+const moment = require('moment-timezone');
+moment().tz("America/New_York").format();
 
 
 exports.addNote = (req, res) => {
@@ -10,9 +10,11 @@ exports.addNote = (req, res) => {
         return res.status(400).json({ msg: 'a note is required' })
     }
 
+
     const newNote = new Note({
         note: note,
-        author: req.user._id
+        author: req.user._id,
+        created: moment().format()
     });
 
     newNote.save()
@@ -43,6 +45,7 @@ exports.getNotes = (req, res, next) => {
         author: req.user._id
     })
         .then(notes => {
+
             res.json(notes)
         })
         .catch(err => next(err));
@@ -91,7 +94,7 @@ exports.getTodayNotes = (req, res, next) => {
         .sort('-created')
         .exec()
         .then(notes => {
-
+            notes.forEach(note => console.log(note.created));
             res.json(notes)
         })
         .catch(err => console.log(err));

@@ -27,6 +27,9 @@ router.delete('/referral/delete/:id', auth, referralController.deleteReferral);
 //get all referral by referee.
 router.get('/referral/myreferrals/:id', auth, referralController.getAllReferralsById);
 
+//get today sales 
+router.get('/today', auth, referralController.getTodaySales);
+
 
 //get all referrals by status page 
 router.get('/my-referrals/:status', auth, referralController.getReferralsStatus);
