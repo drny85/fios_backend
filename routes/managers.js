@@ -12,7 +12,7 @@ const managerController = require('../controllers/manager');
 router.post('/add-manager', auth, managerController.postManager);
 
 //get all referees route
-router.get('/all-managers', auth, managerController.getManagers);
+router.get('/all', auth, managerController.getManagers);
 
 router.get('/details/:id', auth, managerController.getOneManager);
 

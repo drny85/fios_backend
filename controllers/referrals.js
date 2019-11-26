@@ -74,9 +74,9 @@ exports.getReferrals = (req, res, next) => {
       userId: req.user._id
     })
       .populate('referralBy')
-      .populate('manager')
+      .populate('manager', '-password')
       .populate('updatedBy', '-password')
-      .populate('coach', 'name last_name email')
+      .populate('coach', '-password')
       .sort('moveIn')
       .exec()
       .then(referrals => {
@@ -465,6 +465,8 @@ exports.deleteReferral = async (req, res) => {
 //adding the referral handler page
 exports.addReferral = async (req, res, next) => {
 
+  console.log(req.body);
+
   const name = req.body.name;
   const last_name = req.body.last_name;
   const address = req.body.address;
@@ -506,7 +508,7 @@ exports.addReferral = async (req, res, next) => {
 
     });
     const ref = await referral.save();
-    return res.json(ref);
+    return res.status(200).json(ref);
 
 
 

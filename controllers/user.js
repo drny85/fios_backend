@@ -85,52 +85,56 @@ exports.loginUser = (req, res, next) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json(errors.array());
+        return res.status(400).json({ msg: 'please enter a valid email' });
+    }
+
+
+    if (password.length < 6) {
+        return res.status(400).json({ msg: 'password must be at least 6 characters' });
     }
 
     User.findOne({
         email: email
-    })
+    }).populate('coach', '-password')
         .then(user => {
             if (!user) return res.status(400).json({
-                message: 'Not User Found',
-                error: true
+                msg: 'Not User Found'
+
             });
 
             bcrypt.compare(password, user.password, (err, matched) => {
+                console.log(matched);
 
                 if (!matched) return res.status(400).json({
-                    message: 'Invalid email or password'
+                    msg: 'Invalid email or password'
                 });
 
                 const token = user.generateAuthToken();
                 // const decoded = jwt.decode(token);
                 // req.user = decoded;
+
                 res.header('x-auth-token', token).json({
                     message: 'Success',
                     token,
-                    user: _.pick(user, ['_id', 'name', 'email', 'roles'])
+                    user
                 });
             })
         }).catch(err => console.Console(err));
 
 }
-
-exports.getUser = (req, res, next) => {
-    const userId = req.user._id;
-    User.findById(userId)
-        .populate('coach', 'name last_name email')
-        .select('-password')
-        .exec()
-        .then(user => {
-
-            res.json(
-                user
-            );
-        })
+//get user 
+exports.getUser = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id).populate('coach', '-password').select('-password');
 
 
-}
+        return res.status(200).json(user);
+
+    } catch (e) {
+        return res.status(400).json({ msg: 'no user found' });
+    }
+
+};
 
 exports.getUserById = (req, res, next) => {
     const id = req.params.id;
@@ -185,11 +189,11 @@ exports.updateUser = (req, res, next) => {
     User.findOneAndUpdate({
         _id: id
     }, {
-            ...user
+        ...user
 
-        }, {
-            new: true
-        })
+    }, {
+        new: true
+    })
         .populate('coach', 'name last_name email')
         .populate('manager', 'name last_name email')
         .exec()

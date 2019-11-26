@@ -29,6 +29,7 @@ exports.getManagers = (req, res, next) => {
             userId: req.user._id
         })
             .then(managers => {
+                console.log(managers);
                 res.json(
                     managers
                 );

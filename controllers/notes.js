@@ -76,6 +76,7 @@ exports.getNotesByDate = (req, res, next) => {
 }
 
 exports.getTodayNotes = (req, res, next) => {
+    console.log(req.user);
 
     // start today
     let start = moment().startOf('day');
@@ -106,7 +107,7 @@ exports.deleteNote = (req, res, next) => {
 
         Note.findOneAndDelete({ _id: id })
             .then((err, notes) => {
-                res.json({ message: 'note deleted' });
+                res.status(200).json({ message: 'note deleted' });
             })
             .catch(err => next(err));
     }

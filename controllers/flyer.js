@@ -12,10 +12,10 @@ const transporter = nodemailer.createTransport(transport({
 }));
 
 exports.sendFlyer = async (req, res) => {
-    console.log(req.body);
+
     const email = req.body.email;
     let referral;
-    console.log(email);
+
     try {
         referral = await Referral.findById(req.body.id)
         const user = await User.findOne({ _id: req.user._id });

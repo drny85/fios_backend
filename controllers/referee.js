@@ -26,26 +26,28 @@ exports.getAddReferee = (req, res, next) => {
 
 
 
-exports.getReferees = (req, res, next) => {
-  if (req.user.roles.coach || req.user.roles.isAdmin) {
+exports.getReferees = async (req, res, next) => {
 
-    Referee.find()
-      .then(referees => {
-        res.json(referees);
-        //console.log(referees);
-      })
-      .catch(err => next(err));
 
-  } else {
 
-    Referee.find({
-      userId: req.user._id
-    })
-      .then(referees => {
-        res.json(referees);
+  try {
+    if (req.user.roles.isAdmin) {
+      const referees = await Referee.find();
+      return res.status(200).json(referees);
 
-      })
-      .catch(err => console.log(err));
+    } else if (req.user.roles.active) {
+      const referees = await Referee.find({ userId: req.user._id }).select('-referrals');
+      return res.status(200).json(referees);
+
+    }
+
+
+
+
+  } catch (error) {
+
+    return res.status(400).json({ msg: 'no referees found' });
+
   }
 
 

@@ -14,7 +14,7 @@ const refereeController = require('../controllers/referee');
 router.post('/add-referee', auth, refereeController.postReferee);
 
 //get all referees route
-router.get('/all-referees', auth, refereeController.getReferees);
+router.get('/all', auth, refereeController.getReferees);
 
 router.get('/details/:id', auth, refereeController.getOneReferee);
 

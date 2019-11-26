@@ -13,7 +13,7 @@ const refereeSchema = new Schema({
     },
     last_name: {
         type: String,
-        lowercase: true.value,
+        lowercase: true,
         required: true
     },
     phone: String,
