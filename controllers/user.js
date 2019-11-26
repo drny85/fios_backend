@@ -1,6 +1,6 @@
 const User = require('../models/user');
 const _ = require('lodash');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const Referee = require("../models/referee");
@@ -103,7 +103,7 @@ exports.loginUser = (req, res, next) => {
             });
 
             bcrypt.compare(password, user.password, (err, matched) => {
-                console.log(matched);
+
 
                 if (!matched) return res.status(400).json({
                     msg: 'Invalid email or password'
