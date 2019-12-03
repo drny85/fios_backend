@@ -83,6 +83,10 @@ exports.loginUser = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
 
+    if (email === '' && password === '') {
+        return res.status(400).json({ msg: 'All fields required' });
+    }
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ msg: 'please enter a valid email' });
@@ -104,7 +108,7 @@ exports.loginUser = (req, res, next) => {
 
             bcrypt.compare(password, user.password, (err, matched) => {
 
-
+                console.log(matched);
                 if (!matched) return res.status(400).json({
                     msg: 'Invalid email or password'
                 });
